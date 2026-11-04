@@ -269,7 +269,7 @@ function applyMovieFilters() {
   state.filteredMovies = state.allMovies.filter(movie => {
     const matchesSearch = !state.searchQuery || 
       movie.title.toLowerCase().includes(state.searchQuery) ||
-      (movie.director && movie.director.toLowerCase().includes(state.searchQuery));
+      (false);
 
     let movieGenres = Array.isArray(movie.genres) ? movie.genres : (movie.genres ? movie.genres.split(',') : []);
     movieGenres = movieGenres.map(g => g.trim());
@@ -330,7 +330,7 @@ function renderMovieGrid() {
         <div class="p-3 flex-1 flex flex-col justify-between">
           <div>
             <h3 class="font-bold text-sm text-white line-clamp-1 group-hover:text-brand-green transition cursor-pointer" onclick="openMovieDetail(${movie.id})">${movie.title}</h3>
-            <p class="text-xs text-brand-muted mt-0.5">${movie.year} • ${movie.director || 'Unknown'}</p>
+            <p class="text-xs text-brand-muted mt-0.5">${movie.release_year || movie.year || ''}</p>
           </div>
         </div>
       </div>
@@ -381,12 +381,12 @@ async function openMovieDetail(movieId) {
       <div class="flex-1 space-y-4">
         <div>
           <div class="flex items-center gap-2 mb-1">
-            <span class="text-xs font-bold px-2 py-0.5 rounded bg-brand-green/20 text-brand-green border border-brand-green/30">${movie.year}</span>
+            <span class="text-xs font-bold px-2 py-0.5 rounded bg-brand-green/20 text-brand-green border border-brand-green/30">${movie.release_year || movie.year || ""}</span>
             <span class="text-xs text-brand-muted">${movie.duration || ''}</span>
             <span class="text-xs font-bold text-amber-400 flex items-center gap-0.5 ml-auto">★ ${movie.rating || 'N/A'}</span>
           </div>
           <h2 class="text-2xl sm:text-3xl font-black text-white leading-tight">${movie.title}</h2>
-          <p class="text-sm text-brand-muted mt-1">Directed by <span class="text-white font-medium">${movie.director || 'Unknown'}</span></p>
+          <p class="text-sm text-brand-muted mt-1">Directed by <span class="text-white font-medium">${movie.director || ''}</span></p>
         </div>
 
         <!-- Genres Chips -->
@@ -397,7 +397,7 @@ async function openMovieDetail(movieId) {
         <!-- Synopsis -->
         <div>
           <h4 class="text-xs font-bold text-brand-muted uppercase tracking-wider mb-1">Synopsis</h4>
-          <p class="text-sm text-gray-300 leading-relaxed">${movie.synopsis || 'No synopsis available.'}</p>
+          <p class="text-sm text-gray-300 leading-relaxed">${movie.overview || movie.synopsis || 'No synopsis available.'}</p>
         </div>
 
         <!-- Cast -->
@@ -520,7 +520,7 @@ function renderWatchlistGrid() {
     const movie = item.movie || state.allMovies.find(m => String(m.id) === String(movieId)) || {
       id: movieId,
       title: item.title || `Movie #${movieId}`,
-      year: item.year || '',
+      release_year: item.release_year || item.year || '',
       rating: item.rating || '',
       poster_url: item.poster_url || ''
     };
@@ -535,7 +535,7 @@ function renderWatchlistGrid() {
         <div class="p-3 flex-1 flex flex-col justify-between">
           <div>
             <h4 class="font-bold text-sm text-white truncate cursor-pointer hover:text-brand-green" onclick="openMovieDetail(${movie.id})">${movie.title}</h4>
-            <p class="text-xs text-brand-muted mt-0.5">${movie.year || ''}</p>
+            <p class="text-xs text-brand-muted mt-0.5">${movie.release_year || movie.year || ''}</p>
           </div>
           <div class="flex items-center gap-2 mt-3 pt-2 border-t border-brand-border">
             <button onclick="toggleWatchlist(${movie.id})" class="text-xs text-rose-400 hover:text-rose-300 py-1 flex items-center gap-1">
@@ -676,7 +676,7 @@ function renderWatchedList() {
     const movieId = item.movie_id || item.movieId || (item.movie && item.movie.id);
     const movie = item.movie || state.allMovies.find(m => String(m.id) === String(movieId)) || {
       title: item.title || `Movie #${movieId}`,
-      year: item.year || '',
+      release_year: item.release_year || item.year || '',
       poster_url: item.poster_url || ''
     };
 
@@ -690,7 +690,7 @@ function renderWatchedList() {
         <div class="flex-1 space-y-2">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
             <h4 class="font-bold text-base text-white hover:text-brand-green cursor-pointer" onclick="openMovieDetail(${movieId})">
-              ${movie.title} <span class="text-xs text-brand-muted font-normal">(${movie.year || ''})</span>
+              ${movie.title} <span class="text-xs text-brand-muted font-normal">(${movie.release_year || movie.year || ''})</span>
             </h4>
             <div class="flex items-center gap-2">
               <span class="text-amber-400 font-bold text-sm tracking-wider">${ratingStars}</span>
@@ -755,7 +755,7 @@ function renderAiRecommendation(data) {
   const matchedMovie = data.movie || state.allMovies.find(m => String(m.id) === String(movieId)) || {
     id: movieId || 1,
     title: data.title || 'Recommended Film',
-    year: data.year || '',
+    release_year: data.release_year || data.year || '',
     genres: data.genres || ['Recommended'],
     rating: data.rating || 8.5,
     synopsis: data.synopsis || '',
@@ -783,10 +783,10 @@ function renderAiRecommendation(data) {
             <div>
               <div class="flex items-center gap-2">
                 <span class="text-xs font-bold text-amber-400">★ ${matchedMovie.rating || 'N/A'}</span>
-                <span class="text-xs text-brand-muted">• ${matchedMovie.year || ''}</span>
+                <span class="text-xs text-brand-muted">• ${matchedMovie.release_year || matchedMovie.year || ''}</span>
               </div>
               <h3 class="text-2xl font-black text-white hover:text-brand-green cursor-pointer" onclick="openMovieDetail(${matchedMovie.id})">${matchedMovie.title}</h3>
-              <p class="text-xs text-brand-muted">Directed by ${matchedMovie.director || 'Unknown'}</p>
+              <p class="text-xs text-brand-muted">Directed by ${matchedMovie.director || ''}</p>
             </div>
 
             <!-- Gemini Reasoning Card -->
