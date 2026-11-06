@@ -165,6 +165,14 @@ function updateApiUrlDisplay() {
 // 4. TAB NAVIGATION
 // ==========================================
 function switchTab(tabId) {
+  // Guard Check: Cegah pergantian tampilan tab jika belum login
+  if ((tabId === 'watchlist' || tabId === 'watched') && !state.token) {
+    const tabName = tabId === 'watchlist' ? 'Watchlist' : 'Watched list';
+    showToast(`Silakan login terlebih dahulu untuk melihat ${tabName}`, 'info');
+    openAuthModal('login');
+    return; // Hentikan fungsi SEBELUM tampilan tab berpindah
+  }
+
   state.currentTab = tabId;
 
   // Update tabs UI
@@ -183,20 +191,10 @@ function switchTab(tabId) {
     activeNav.classList.add('text-white', 'bg-brand-card');
   }
 
-  // Refresh tab data if needed
+  // Refresh tab data jika pengguna sudah authenticated
   if (tabId === 'watchlist') {
-    if (!state.token) {
-      showToast('Silakan login terlebih dahulu untuk melihat Watchlist', 'info');
-      openAuthModal('login');
-      return;
-    }
     loadWatchlist();
   } else if (tabId === 'watched') {
-    if (!state.token) {
-      showToast('Silakan login terlebih dahulu untuk melihat Watched list', 'info');
-      openAuthModal('login');
-      return;
-    }
     loadWatchedList();
   }
 
@@ -943,6 +941,10 @@ function logout() {
   state.watchedList = [];
   localStorage.removeItem('filmlog_token');
   localStorage.removeItem('filmlog_user');
+  
+  renderWatchlistGrid();
+  renderWatchedList();
+  
   renderAuthUI();
   applyMovieFilters();
   switchTab('discover');
