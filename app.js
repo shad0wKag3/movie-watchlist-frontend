@@ -942,12 +942,12 @@ function logout() {
   localStorage.removeItem('filmlog_token');
   localStorage.removeItem('filmlog_user');
 
-  // Reset navbar badge counters to reflect empty state after logout
-  const watchlistBadge = document.querySelector('#watchlist-count');
-  if (watchlistBadge) {
-    watchlistBadge.textContent = '0';
-    // Or add hidden class if you hide zero badges: watchlistBadge.classList.add('hidden');
-  }
+  // Direct DOM Reset for Watchlist Badge Counters
+  const badgeSelectors = ['#watchlist-count', '#watchlist-badge', '.watchlist-count', '.watchlist-badge'];
+  badgeSelectors.forEach((selector) => {
+    const el = document.querySelector(selector);
+    if (el) el.textContent = '0';
+  });
 
   renderWatchlistGrid();
   renderWatchedList();
