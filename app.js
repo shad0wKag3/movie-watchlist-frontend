@@ -941,7 +941,14 @@ function logout() {
   state.watchedList = [];
   localStorage.removeItem('filmlog_token');
   localStorage.removeItem('filmlog_user');
-  
+
+  // Reset navbar badge counters to reflect empty state after logout
+  const watchlistBadge = document.querySelector('#watchlist-count');
+  if (watchlistBadge) {
+    watchlistBadge.textContent = '0';
+    // Or add hidden class if you hide zero badges: watchlistBadge.classList.add('hidden');
+  }
+
   renderWatchlistGrid();
   renderWatchedList();
   
