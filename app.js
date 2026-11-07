@@ -942,12 +942,18 @@ function logout() {
   localStorage.removeItem('filmlog_token');
   localStorage.removeItem('filmlog_user');
 
-  // Direct DOM Reset for Watchlist Badge Counters
-  const badgeSelectors = ['#watchlist-count', '#watchlist-badge', '.watchlist-count', '.watchlist-badge'];
-  badgeSelectors.forEach((selector) => {
-    const el = document.querySelector(selector);
-    if (el) el.textContent = '0';
-  });
+  // Reset navbar Watchlist badge to 0 and hide it
+  const watchlistBadge = document.querySelector('#watchlist-badge');
+  if (watchlistBadge) {
+    watchlistBadge.textContent = '0';
+    watchlistBadge.classList.add('hidden');
+  }
+
+  // Also reset total count text on Watchlist tab header if present
+  const watchlistCount = document.querySelector('#watchlist-count');
+  if (watchlistCount) {
+    watchlistCount.textContent = '0 films';
+  }
 
   renderWatchlistGrid();
   renderWatchedList();
